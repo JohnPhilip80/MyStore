@@ -1,17 +1,19 @@
 package com.john.mystore.models;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-
 public class ProductDto {
-	@NotEmpty(message = "The name is required")
+	
+	private int id;
 	private String name;
-	@NotEmpty(message = "The brand is required")
 	private String brand;
-	@NotEmpty(message = "The category is required")
 	private String category;
-	@Min(0)
 	private double price;
+	
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
 	public String getName() {
 		return name;
 	}
@@ -36,5 +38,4 @@ public class ProductDto {
 	public void setPrice(double price) {
 		this.price = price;
 	}
-	
 }
