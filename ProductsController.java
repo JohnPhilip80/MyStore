@@ -1,31 +1,22 @@
 package com.john.mystore.controllers;
-
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
+import org.springframework.web.bind.annotation.RequestParam;
 import com.john.mystore.models.Product;
 import com.john.mystore.models.ProductDto;
-import com.john.mystore.services.ProductsService;
-
-import jakarta.validation.Valid;
-
-
-
+import com.john.mystore.services.ProductServices;
 
 @Controller
 @RequestMapping("/products")
-public class ProductsController {
+public class ProductController {
 	@Autowired
-	private ProductsService service;
+	private ProductServices service;
 	
 	@GetMapping({"","/"})
 	public String showProductList(Model model) {
@@ -35,41 +26,41 @@ public class ProductsController {
 	}
 	@GetMapping("/create")
 	public String showCreateProduct(Model model) {
-		System.out.println("Testing111");
-		ProductDto productDto=new ProductDto();
-		
+		ProductDto productDto = new ProductDto();
 		model.addAttribute("productDto",productDto);
 		return "products/CreateProduct";
 	}
-	
 	@PostMapping("/create")
-	public String createProduct(@Valid @ModelAttribute ProductDto productDto,BindingResult result) {
-		
-		System.out.println("Testing123");
-		if(result.hasErrors()) {
-			System.out.println("Testing13333");
-			return "products/CreateProduct";
-		}
-		
+	public String createProduct(@ModelAttribute ProductDto productDto) {
 		Product product = new Product();
+		//product.setId(productDto.getId());
 		product.setName(productDto.getName());
 		product.setBrand(productDto.getBrand());
 		product.setCategory(productDto.getCategory());
 		product.setPrice(productDto.getPrice());
-		
 		service.addProduct(product);
-		
 		return "redirect:/products";
 	}
-	
-	@GetMapping({"/edit"})
-	public String showEditProduct() {
+	@GetMapping("/edit")
+	public String showEditProduct(Model model,@RequestParam("id") int id) {
+		Product product = service.findProductById(id);
+		model.addAttribute("productDto",product);
 		return "products/EditProduct";
 	}
-	
 	@PostMapping("/edit")
-	public String EditProduct() {
-		
+	public String editProduct(@RequestParam("id") int id, @ModelAttribute ProductDto productDto) {
+			Product product = service.findProductById(id);
+			product.setId(productDto.getId());
+			product.setName(productDto.getName());
+			product.setBrand(productDto.getBrand());
+			product.setCategory(productDto.getCategory());
+			product.setPrice(productDto.getPrice());
+			service.updateProduct(product);
+		return "redirect:/products";
+	}
+	@GetMapping("/delete")
+	public String deleteProduct(@RequestParam("id") int id) {
+		service.deleteProduct(id);
 		return "redirect:/products";
 	}
 }
